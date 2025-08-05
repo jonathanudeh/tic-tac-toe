@@ -4,7 +4,7 @@ function PlayersCard() {
   const { state } = useGame();
 
   return (
-    <div className="w-full sm:w-2/5 h-auto flex items-center justify-between">
+    <div className="w-full sm:w-2/5 h-auto flex items-center justify-between m-0 p-0">
       {/* player X */}
       <div
         className={`${

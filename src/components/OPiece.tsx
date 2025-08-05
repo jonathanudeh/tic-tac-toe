@@ -5,9 +5,9 @@ function OPiece() {
 
   return (
     <div
-      className={`text-[#FFD700] font-bold ${
-        state.gameStatus !== "pickSide" ? "text-7xl" : "text-8xl"
-      }`}
+      className={`${
+        state.winner === "O" ? "text-[#9d7bfc]" : "text-[#FFD700]"
+      } font-bold ${state.gameStatus !== "pickSide" ? "text-7xl" : "text-8xl"}`}
     >
       O
     </div>

@@ -4,7 +4,7 @@ function ScoreBoard() {
   const { state, dispatch } = useGame();
 
   return (
-    <div className="flex w-full justify-between">
+    <div className="flex w-full sm:w-3/5 justify-between">
       <button
         className="bg-[cyan] w-25 h-15 rounded-lg flex flex-col items-center justify-around cursor-pointer"
         onClick={() => dispatch({ type: "BACK_TO_MENU" })}
@@ -17,13 +17,6 @@ function ScoreBoard() {
           <div className="flex flex-col items-center">
             <span className="text-xs opacity-75">Turn</span>
             <span className="font-bold">{state.currentPlayer}</span>
-          </div>
-        ) : state.gameStatus === "finished" ? (
-          <div className="flex flex-col items-center">
-            <span className="text-xs opacity-75">Result</span>
-            <span className="font-bold text-xs">
-              {state.winner ? `${state.winner} Won!` : "Draw!"}
-            </span>
           </div>
         ) : (
           <span className="text-sm">Ready</span>

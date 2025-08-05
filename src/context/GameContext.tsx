@@ -20,6 +20,7 @@ interface GameState {
   gameStatus: "menu" | "pickSide" | "playing" | "finished" | "settings";
   currentPlayer: Player;
   winner: Player | null;
+  winningCombination: number[] | null;
   isDraw: boolean;
   players: {
     X: GamePlayer;
@@ -39,6 +40,7 @@ type GameAction =
   // | { type: "CONFIRM_PLAYER_CHOICE" }
   | { type: "START_GAME" }
   | { type: "MAKE_MOVE"; payload: { cellIndex: number } }
+  | { type: "AI_MOVE" }
   | { type: "NEW_ROUND" }
   | { type: "RESET_GAME" }
   | { type: "BACK_TO_MENU" }
@@ -55,6 +57,7 @@ const initialState: GameState = {
   gameStatus: "menu",
   currentPlayer: "X",
   winner: null,
+  winningCombination: null,
   isDraw: false,
   players: {
     X: {
@@ -77,12 +80,14 @@ const initialState: GameState = {
   round: 1,
   draws: 0,
   gameMode: null,
-  gameBoardStyle: "boxes",
+  gameBoardStyle: "lines",
   humanPlayer: null,
   selectedPlayer: null,
 };
 
-const checkWinner = (board: Board): Player | null => {
+const checkWinner = (
+  board: Board
+): { winner: Player | null; winningCombination: number[] | null } => {
   const winningCombination = [
     [0, 1, 2],
     [3, 4, 5],
@@ -96,11 +101,86 @@ const checkWinner = (board: Board): Player | null => {
 
   for (const [a, b, c] of winningCombination) {
     if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      return board[a];
+      return {
+        winner: board[a],
+        winningCombination: [a, b, c],
+      };
     }
   }
 
-  return null;
+  return { winner: null, winningCombination: null };
+};
+
+const isDefiniteDraw = (board: Board): boolean => {
+  const { winner } = checkWinner(board);
+  if (winner) return false;
+
+  const emptyCells = board
+    .map((cell, i) => (cell === null ? i : null))
+    .filter((i) => i !== null) as number[];
+
+  if (emptyCells.length > 1) return false;
+
+  // Test if X can win
+  const canXWin = emptyCells.some((cell) => {
+    const testBoard = [...board];
+    testBoard[cell] = "X";
+    return checkWinner(testBoard).winner === "X";
+  });
+
+  // Test if O can win
+  const canOWin = emptyCells.some((cell) => {
+    const testBoard = [...board];
+    testBoard[cell] = "O";
+    return checkWinner(testBoard).winner === "O";
+  });
+
+  return !canXWin && !canOWin;
+};
+
+const getSmartAIMove = (board: Board, aiPlayer: Player): number => {
+  const available = board
+    .map((val, i) => (val === null ? i : null))
+    .filter((i) => i !== null) as number[];
+
+  const humanPlayer = aiPlayer === "X" ? "O" : "X";
+
+  // Strategy 1: Win if possible
+  for (const cell of available) {
+    const testBoard = [...board];
+    testBoard[cell] = aiPlayer;
+    if (checkWinner(testBoard).winner === aiPlayer) {
+      return cell;
+    }
+  }
+
+  // Strategy 2: Block human's winning move
+  for (const cell of available) {
+    const testBoard = [...board];
+    testBoard[cell] = humanPlayer;
+    if (checkWinner(testBoard).winner === humanPlayer) {
+      return cell; // Block this winning move
+    }
+  }
+
+  // Strategy 3: Take center if available
+  if (available.includes(4)) {
+    return 4;
+  }
+
+  // Strategy 4: Take corners (good strategic positions)
+  const corners = [0, 2, 6, 8];
+  const availableCorners = corners.filter((corner) =>
+    available.includes(corner)
+  );
+  if (availableCorners.length > 0) {
+    return availableCorners[
+      Math.floor(Math.random() * availableCorners.length)
+    ];
+  }
+
+  // Strategy 5: Take any remaining cell
+  return available[Math.floor(Math.random() * available.length)];
 };
 
 const reducer = (state: GameState, action: GameAction): GameState => {
@@ -113,9 +193,6 @@ const reducer = (state: GameState, action: GameAction): GameState => {
         selectedPlayer: null,
         humanPlayer: null,
       };
-
-    // case "SELECT_PLAYER":
-    //   return { ...state, selectedPlayer: action.payload };
 
     case "SELECT_PLAYER": {
       if (!action.payload) return state;
@@ -155,6 +232,7 @@ const reducer = (state: GameState, action: GameAction): GameState => {
         ...state,
         board: Array(9).fill(null),
         winner: null,
+        winningCombination: null,
         isDraw: false,
         gameStatus: "playing",
         currentPlayer: "X",
@@ -170,8 +248,10 @@ const reducer = (state: GameState, action: GameAction): GameState => {
       const newBoard = [...state.board];
       newBoard[cellIndex] = state.currentPlayer;
 
-      const winner = checkWinner(newBoard);
-      const isDraw = !winner && newBoard.every((cell) => cell !== null);
+      const { winner, winningCombination } = checkWinner(newBoard);
+      const isDraw =
+        !winner &&
+        (newBoard.every((cell) => cell !== null) || isDefiniteDraw(newBoard));
 
       let updatedPlayers = state.players;
       let updatedDraws = state.draws;
@@ -198,6 +278,59 @@ const reducer = (state: GameState, action: GameAction): GameState => {
           gameStatus === "playing" ? nextPlayer : state.currentPlayer,
         gameStatus,
         winner,
+        winningCombination,
+        isDraw,
+        players: updatedPlayers,
+        draws: updatedDraws,
+      };
+    }
+
+    case "AI_MOVE": {
+      if (
+        state.gameStatus !== "playing" ||
+        state.gameMode !== "vsAi" ||
+        !state.players[state.currentPlayer] ||
+        state.players[state.currentPlayer].isHuman
+      ) {
+        return state;
+      }
+
+      const aiMove = getSmartAIMove(state.board, state.currentPlayer);
+
+      const newBoard = [...state.board];
+      newBoard[aiMove] = state.currentPlayer;
+
+      const { winner, winningCombination } = checkWinner(newBoard);
+      const isDraw =
+        !winner &&
+        (newBoard.every((cell) => cell !== null) || isDefiniteDraw(newBoard));
+
+      let updatedPlayers = state.players;
+      let updatedDraws = state.draws;
+
+      if (winner) {
+        updatedPlayers = {
+          ...state.players,
+          [winner]: {
+            ...state.players[winner],
+            score: state.players[winner].score + 1,
+          },
+        };
+      } else if (isDraw) {
+        updatedDraws = state.draws + 1;
+      }
+
+      const gameStatus = winner || isDraw ? "finished" : "playing";
+      const nextPlayer = state.currentPlayer === "X" ? "O" : "X";
+
+      return {
+        ...state,
+        board: newBoard,
+        currentPlayer:
+          gameStatus === "playing" ? nextPlayer : state.currentPlayer,
+        gameStatus,
+        winner,
+        winningCombination,
         isDraw,
         players: updatedPlayers,
         draws: updatedDraws,
@@ -209,6 +342,7 @@ const reducer = (state: GameState, action: GameAction): GameState => {
         ...state,
         board: Array(9).fill(null),
         winner: null,
+        winningCombination: null,
         isDraw: false,
         gameStatus: "playing",
         currentPlayer: "X",
@@ -220,6 +354,7 @@ const reducer = (state: GameState, action: GameAction): GameState => {
         ...state,
         board: Array(9).fill(null),
         winner: null,
+        winningCombination: null,
         isDraw: false,
         gameStatus: "playing",
         currentPlayer: "X",
