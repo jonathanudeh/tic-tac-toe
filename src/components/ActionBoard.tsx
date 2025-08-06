@@ -1,6 +1,6 @@
 import { useGame } from "../context/GameContext";
 
-function ScoreBoard() {
+function ActionBoard() {
   const { state, dispatch } = useGame();
 
   return (
@@ -38,4 +38,4 @@ function ScoreBoard() {
   );
 }
 
-export default ScoreBoard;
+export default ActionBoard;

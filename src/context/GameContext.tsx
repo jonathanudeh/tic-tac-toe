@@ -15,6 +15,12 @@ interface GamePlayer {
   score: number;
 }
 
+interface GameSettings {
+  boardStyle: "lines" | "boxes";
+  soundEnabled: boolean;
+  aiDifficulty: "easy" | "meduim" | "hard";
+}
+
 interface GameState {
   board: Board;
   gameStatus: "menu" | "pickSide" | "playing" | "finished" | "settings";
@@ -29,15 +35,14 @@ interface GameState {
   round: number;
   draws: number;
   gameMode: "vsAi" | "vsPlayer" | null;
-  gameBoardStyle: "lines" | "boxes";
   humanPlayer: Player | null;
   selectedPlayer: Player | null;
+  settings: GameSettings;
 }
 
 type GameAction =
   | { type: "PICK_A_SIDE"; payload: "vsAi" | "vsPlayer" }
   | { type: "SELECT_PLAYER"; payload: Player }
-  // | { type: "CONFIRM_PLAYER_CHOICE" }
   | { type: "START_GAME" }
   | { type: "MAKE_MOVE"; payload: { cellIndex: number } }
   | { type: "AI_MOVE" }
@@ -46,12 +51,22 @@ type GameAction =
   | { type: "BACK_TO_MENU" }
   | { type: "OPEN_SETTINGS" }
   | { type: "CLOSE_SETTINGS" }
-  | { type: "CHANGE_THINGS"; payload: string };
+  | {
+      type: "UPDATE_SETTING";
+      payload: { key: keyof GameSettings; value: any };
+    }
+  | { type: "RESET_SETTINGS" };
 
 interface GameContextType {
   state: GameState;
   dispatch: React.Dispatch<GameAction>;
 }
+
+const defaultSettings: GameSettings = {
+  boardStyle: "lines",
+  soundEnabled: true,
+  aiDifficulty: "easy",
+};
 
 const initialState: GameState = {
   board: Array(9).fill(null),
@@ -81,9 +96,9 @@ const initialState: GameState = {
   round: 1,
   draws: 0,
   gameMode: null,
-  gameBoardStyle: "lines",
   humanPlayer: null,
   selectedPlayer: null,
+  settings: defaultSettings,
 };
 
 const checkWinner = (
@@ -250,6 +265,10 @@ const reducer = (state: GameState, action: GameAction): GameState => {
       newBoard[cellIndex] = state.currentPlayer;
 
       const { winner, winningCombination } = checkWinner(newBoard);
+
+      if (!winner && state.settings.soundEnabled)
+        new Audio("/button-click.wav").play();
+
       const isDraw =
         !winner &&
         (newBoard.every((cell) => cell !== null) || isDefiniteDraw(newBoard));
@@ -265,11 +284,16 @@ const reducer = (state: GameState, action: GameAction): GameState => {
             score: state.players[winner].score + 1,
           },
         };
+
+        if (state.settings.soundEnabled) new Audio("/win.mp3").play();
       } else if (isDraw) {
         updatedDraws = state.draws + 1;
+
+        if (state.settings.soundEnabled) new Audio("/draw.mp3").play();
       }
 
       const gameStatus = winner || isDraw ? "finished" : "playing";
+      // if (gameStatus === "finished" && !winner) new Audio("/lost.wav").play();
       const nextPlayer = state.currentPlayer === "X" ? "O" : "X";
 
       return {
@@ -302,6 +326,10 @@ const reducer = (state: GameState, action: GameAction): GameState => {
       newBoard[aiMove] = state.currentPlayer;
 
       const { winner, winningCombination } = checkWinner(newBoard);
+
+      if (!winner && state.settings.soundEnabled)
+        new Audio("/button-click.wav").play();
+
       const isDraw =
         !winner &&
         (newBoard.every((cell) => cell !== null) || isDefiniteDraw(newBoard));
@@ -317,8 +345,11 @@ const reducer = (state: GameState, action: GameAction): GameState => {
             score: state.players[winner].score + 1,
           },
         };
+
+        if (state.settings.soundEnabled) new Audio("/lost.wav").play();
       } else if (isDraw) {
         updatedDraws = state.draws + 1;
+        if (state.settings.soundEnabled) new Audio("/draw.mp3").play();
       }
 
       const gameStatus = winner || isDraw ? "finished" : "playing";
@@ -369,7 +400,7 @@ const reducer = (state: GameState, action: GameAction): GameState => {
       };
 
     case "BACK_TO_MENU":
-      return { ...initialState, gameBoardStyle: state.gameBoardStyle };
+      return { ...initialState, settings: state.settings };
 
     case "OPEN_SETTINGS":
       return { ...state, gameStatus: "settings" };
@@ -377,8 +408,17 @@ const reducer = (state: GameState, action: GameAction): GameState => {
     case "CLOSE_SETTINGS":
       return { ...state, gameStatus: "menu" };
 
-    case "CHANGE_THINGS":
-      return { ...state, gameBoardStyle: action.payload };
+    case "UPDATE_SETTING":
+      return {
+        ...state,
+        settings: {
+          ...state.settings,
+          [action.payload.key]: action.payload.value,
+        },
+      };
+
+    case "RESET_SETTINGS":
+      return { ...state, settings: defaultSettings };
 
     default:
       throw new Error("Unknow action type");

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGame } from "../context/GameContext";
 import OPiece from "./OPiece";
 import PlayersCard from "./PlayersCard";
@@ -7,15 +7,43 @@ import XPiece from "./XPiece";
 
 function GameBoard() {
   const { state, dispatch } = useGame();
+  const [showGameFinished, setShowGameFinished] = useState(
+    state.gameStatus === "finished"
+  );
 
   const {
     board,
-    gameBoardStyle,
+    settings,
     currentPlayer,
     round,
     gameStatus,
     winningCombination,
   } = state;
+
+  useEffect(() => {
+    if (state.gameStatus === "finished") {
+      setShowGameFinished(false);
+
+      const finishedTimer = setTimeout(() => {
+        setShowGameFinished(true);
+      }, 1500);
+
+      return () => clearTimeout(finishedTimer);
+    } else {
+      setShowGameFinished(false);
+    }
+  }, [state.gameStatus]);
+
+  useEffect(() => {
+    if (showGameFinished) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [showGameFinished]);
 
   useEffect(() => {
     // run if it's Ai turn
@@ -50,9 +78,10 @@ function GameBoard() {
     dispatch({ type: "MAKE_MOVE", payload: { cellIndex } });
   };
 
-  const renderPiece = (cellValue: "X" | "O" | null) => {
-    if (cellValue === "X") return <XPiece />;
-    if (cellValue === "O") return <OPiece />;
+  const renderPiece = (cellValue: "X" | "O" | null, cellIndex: number) => {
+    const isWinning = isWinningCell(cellIndex);
+    if (cellValue === "X") return <XPiece isWinning={isWinning} />;
+    if (cellValue === "O") return <OPiece isWinning={isWinning} />;
     return null;
   };
 
@@ -78,7 +107,7 @@ function GameBoard() {
 
       <PlayersCard />
 
-      {gameBoardStyle === "lines" ? (
+      {settings.boardStyle === "lines" ? (
         <div className="relative  w-full sm:w-lg sm:h-80">
           <div className="absolute inset-0 pointer-events-none">
             {/* Vertical Lines */}
@@ -95,11 +124,14 @@ function GameBoard() {
                 key={i}
                 className={getCellClassName(
                   i,
-                  "aspect-square sm:aspect-video flex items-center justify-center w-full h-full hover:bg-white/10"
+                  `aspect-square sm:aspect-video flex items-center justify-center w-full h-full ${
+                    gameStatus !== "finished" &&
+                    "hover:bg-white/10 cursor-pointer"
+                  }`
                 )}
                 onClick={() => handleCellClick(i)}
               >
-                {square && renderPiece(square)}
+                {square && renderPiece(square, i)}
               </button>
             ))}
           </div>
@@ -111,53 +143,55 @@ function GameBoard() {
               key={i}
               className={getCellClassName(
                 i,
-                "aspect-square sm:aspect-video w-full h-full  backdrop-blur-sm shadow-lg rounded-lg border-2 border-white/20 flex items-center justify-center text-4xl font-bold text-white hover:bg-white/20 transition-all duration-300"
+                `aspect-square sm:aspect-video w-full h-full  backdrop-blur-sm shadow-lg rounded-lg border-2 border-white/20 flex items-center justify-center text-4xl font-bold text-white  transition-all duration-300 ${
+                  gameStatus !== "finished" &&
+                  "hover:bg-white/20 cursor-pointer"
+                }`
               )}
               onClick={() => handleCellClick(i)}
             >
-              {square && renderPiece(square)}
+              {square && renderPiece(square, i)}
             </button>
           ))}
         </div>
       )}
 
-      {/* Game Finished Actions */}
-      {gameStatus === "finished" && (
-        <div className="bg-black/40 fixed inset-0 w-full h-full"></div>
-      )}
-      {gameStatus === "finished" && (
-        <div className="fixed top-1/2 -translate-y-1/2 bg-[#9d7bfc]  w-4/5 sm:w-2/3 h-60 rounded-lg flex flex-col items-center justify-start gap-7 p-4">
-          <div className="flex flex-col items-center justify-center gap-5 font-bold w-full h-2/3 text-center">
-            <span className="text-2xl opacity-75">
-              {state.winner === state.selectedPlayer && "Yayy,🥳 You Won!"}
-              {state.winner !== state.selectedPlayer &&
-                !state.isDraw &&
-                "sigh,😔 you lost..."}
-            </span>
-            <span
-              className={`font-bold text-5xl ${
-                state.winner === "X" && "text-[#1100ff]"
-              } ${state.winner === "O" && "text-[#FFD700]"}`}
-            >
-              {state.winner ? `${state.winner} wins` : "Round Tied"}
-            </span>
-          </div>
+      {showGameFinished && (
+        <>
+          <div className="bg-black/40 fixed inset-0 w-full h-full"></div>
+          <div className="fixed top-1/2 -translate-y-1/2 bg-[#9d7bfc]  w-4/5 sm:w-2/3 h-60 rounded-lg flex flex-col items-center justify-start gap-7 p-4">
+            <div className="flex flex-col items-center justify-center gap-5 font-bold w-full h-2/3 text-center">
+              <span className="text-2xl opacity-75">
+                {state.winner === state.selectedPlayer && "Yayy,🥳 You Won!"}
+                {state.winner !== state.selectedPlayer &&
+                  !state.isDraw &&
+                  "sigh,😔 you lost..."}
+              </span>
+              <span
+                className={`font-bold text-5xl ${
+                  state.winner === "X" && "text-[#1100ff]"
+                } ${state.winner === "O" && "text-[#FFD700]"}`}
+              >
+                {state.winner ? `${state.winner} wins` : "Round Tied"}
+              </span>
+            </div>
 
-          <div className="flex items-center justify-between gap-7">
-            <button
-              className="bg-red-500/50 backdrop-blur-sm text-white w-20 h-12 rounded-lg font-bold border-b-4 border-b-red-800 hover:bg-red-500 transition-all cursor-pointer"
-              onClick={() => dispatch({ type: "BACK_TO_MENU" })}
-            >
-              Quit
-            </button>
-            <button
-              className="bg-green-500/80 backdrop-blur-sm text-white w-30 h-12 rounded-lg font-bold border-b-4 border-b-green-800 hover:bg-green-500 transition-all cursor-pointer"
-              onClick={() => dispatch({ type: "NEW_ROUND" })}
-            >
-              New Round
-            </button>
+            <div className="flex items-center justify-between gap-7">
+              <button
+                className="bg-red-500/50 backdrop-blur-sm text-white w-20 h-12 rounded-lg font-bold border-b-4 border-b-red-800 hover:bg-red-500 transition-all cursor-pointer"
+                onClick={() => dispatch({ type: "BACK_TO_MENU" })}
+              >
+                Quit
+              </button>
+              <button
+                className="bg-green-500/80 backdrop-blur-sm text-white w-30 h-12 rounded-lg font-bold border-b-4 border-b-green-800 hover:bg-green-500 transition-all cursor-pointer"
+                onClick={() => dispatch({ type: "NEW_ROUND" })}
+              >
+                New Round
+              </button>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       <ScoreBoard />
