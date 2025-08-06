@@ -45,7 +45,8 @@ type GameAction =
   | { type: "RESET_GAME" }
   | { type: "BACK_TO_MENU" }
   | { type: "OPEN_SETTINGS" }
-  | { type: "CLOSE_SETTINGS" };
+  | { type: "CLOSE_SETTINGS" }
+  | { type: "CHANGE_THINGS"; payload: string };
 
 interface GameContextType {
   state: GameState;
@@ -140,8 +141,8 @@ const isDefiniteDraw = (board: Board): boolean => {
 
 const getSmartAIMove = (board: Board, aiPlayer: Player): number => {
   const available = board
-    .map((val, i) => (val === null ? i : null))
-    .filter((i) => i !== null) as number[];
+    .map((val, i) => (val === null ? i : -1))
+    .filter((i) => i !== -1) as number[];
 
   const humanPlayer = aiPlayer === "X" ? "O" : "X";
 
@@ -368,13 +369,16 @@ const reducer = (state: GameState, action: GameAction): GameState => {
       };
 
     case "BACK_TO_MENU":
-      return { ...initialState };
+      return { ...initialState, gameBoardStyle: state.gameBoardStyle };
 
     case "OPEN_SETTINGS":
       return { ...state, gameStatus: "settings" };
 
     case "CLOSE_SETTINGS":
       return { ...state, gameStatus: "menu" };
+
+    case "CHANGE_THINGS":
+      return { ...state, gameBoardStyle: action.payload };
 
     default:
       throw new Error("Unknow action type");

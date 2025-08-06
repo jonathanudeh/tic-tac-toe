@@ -29,7 +29,7 @@ function GameBoard() {
         dispatch({
           type: "AI_MOVE",
         });
-      }, 800);
+      }, 1000);
 
       return () => clearTimeout(timer);
     }
@@ -129,10 +129,10 @@ function GameBoard() {
         <div className="fixed top-1/2 -translate-y-1/2 bg-[#9d7bfc]  w-4/5 sm:w-2/3 h-60 rounded-lg flex flex-col items-center justify-start gap-7 p-4">
           <div className="flex flex-col items-center justify-center gap-5 font-bold w-full h-2/3 text-center">
             <span className="text-2xl opacity-75">
-              {state.winner === state.selectedPlayer && "Yayy🥳 You Won!"}
+              {state.winner === state.selectedPlayer && "Yayy,🥳 You Won!"}
               {state.winner !== state.selectedPlayer &&
                 !state.isDraw &&
-                "sigh😔 you lost."}
+                "sigh,😔 you lost..."}
             </span>
             <span
               className={`font-bold text-5xl ${

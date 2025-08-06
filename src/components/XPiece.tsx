@@ -7,7 +7,7 @@ function XPiece() {
     <div
       className={`${
         state.winner === "X" ? "text-[#9d7bfc]" : "text-[#1100ff]"
-      } font-bold ${state.gameStatus !== "pickSide" ? "text-7xl" : "text-8xl"}`}
+      } font-bold ${state.gameStatus !== "pickSide" ? "text-8xl" : "text-8xl"}`}
     >
       X
     </div>

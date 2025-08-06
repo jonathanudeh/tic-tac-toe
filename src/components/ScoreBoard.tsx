@@ -11,17 +11,22 @@ function ScoreBoard() {
       >
         Menu
       </button>
-
-      <div className="bg-blue-500/80 backdrop-blur-sm text-white py-3 px-4 rounded-lg font-semibold flex-1 max-w-32 text-center">
-        {state.gameStatus === "playing" ? (
-          <div className="flex flex-col items-center">
-            <span className="text-xs opacity-75">Turn</span>
-            <span className="font-bold">{state.currentPlayer}</span>
+      {state.gameStatus === "playing" && (
+        <div className="bg-[#1A004D]/80 w-30 h-15 rounded-lg border-b-4 border-[#1A004D]">
+          <div className="flex gap-2 justify-center items-center w-full h-full text-white">
+            <span
+              className={`font-bold text-2xl ${
+                state.currentPlayer === "X"
+                  ? "text-[#4135ee]"
+                  : "text-[#FFD700]"
+              }`}
+            >
+              {state.currentPlayer === "X" ? "X" : "O"}
+            </span>
+            Turn
           </div>
-        ) : (
-          <span className="text-sm">Ready</span>
-        )}
-      </div>
+        </div>
+      )}
 
       <button
         className="bg-[purple] w-25 h-15 rounded-lg flex flex-col items-center justify-around cursor-pointer"
