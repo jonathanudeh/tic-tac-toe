@@ -57,7 +57,7 @@ function GameBoard() {
         dispatch({
           type: "AI_MOVE",
         });
-      }, 500);
+      }, 1000);
 
       return () => clearTimeout(timer);
     }
