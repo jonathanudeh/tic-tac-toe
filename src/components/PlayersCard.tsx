@@ -22,10 +22,14 @@ function PlayersCard() {
         >
           {state.players["X"].avatar}
         </div>
-        <div className="text-white font-bold flex flex-col items-center">
+        <div className="text-cyan-400 font-bold flex flex-col items-center">
           <span
             className={`${
-              state.gameStatus !== "playing" ? "text-2xl" : "text-md"
+              state.gameStatus === "finished"
+                ? "text-lg"
+                : state.gameStatus !== "playing"
+                ? "text-2xl"
+                : "text-2xl"
             }`}
           >
             {state.gameStatus !== "playing" && state.players["X"].name}
@@ -72,7 +76,7 @@ function PlayersCard() {
                 ? "text-lg"
                 : state.gameStatus !== "playing"
                 ? "text-2xl"
-                : "text-l"
+                : "text-2xl"
             }`}
           >
             {state.gameStatus !== "playing" && state.players["O"].name}

@@ -291,7 +291,12 @@ const reducer = (state: GameState, action: GameAction): GameState => {
     case "MAKE_MOVE": {
       const { cellIndex } = action.payload;
 
-      if (state.board[cellIndex] !== null || state.gameStatus !== "playing") {
+      if (
+        state.board[cellIndex] !== null ||
+        state.gameStatus !== "playing" ||
+        (state.gameMode === "vsAi" &&
+          !state.players[state.currentPlayer].isHuman)
+      ) {
         return state;
       }
 
