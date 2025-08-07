@@ -18,7 +18,7 @@ interface GamePlayer {
 interface GameSettings {
   boardStyle: "lines" | "boxes";
   soundEnabled: boolean;
-  aiDifficulty: "easy" | "meduim" | "hard";
+  aiDifficulty: "easy" | "medium" | "hard";
 }
 
 interface GameState {
@@ -154,15 +154,19 @@ const isDefiniteDraw = (board: Board): boolean => {
   return !canXWin && !canOWin;
 };
 
-const getSmartAIMove = (board: Board, aiPlayer: Player): number => {
-  const available = board
-    .map((val, i) => (val === null ? i : -1))
-    .filter((i) => i !== -1) as number[];
+const getSmartAIMove = (
+  board: Board,
+  aiPlayer: Player,
+  aiDifficulty: "easy" | "medium" | "hard"
+): number => {
+  const emptyCells = board
+    .map((cell, index) => (cell === null ? index : -1))
+    .filter((index) => index !== -1);
 
   const humanPlayer = aiPlayer === "X" ? "O" : "X";
 
   // Strategy 1: Win if possible
-  for (const cell of available) {
+  for (const cell of emptyCells) {
     const testBoard = [...board];
     testBoard[cell] = aiPlayer;
     if (checkWinner(testBoard).winner === aiPlayer) {
@@ -171,32 +175,62 @@ const getSmartAIMove = (board: Board, aiPlayer: Player): number => {
   }
 
   // Strategy 2: Block human's winning move
-  for (const cell of available) {
+  for (const cell of emptyCells) {
     const testBoard = [...board];
     testBoard[cell] = humanPlayer;
     if (checkWinner(testBoard).winner === humanPlayer) {
-      return cell; // Block this winning move
+      return cell;
     }
   }
 
   // Strategy 3: Take center if available
-  if (available.includes(4)) {
+  if (aiDifficulty === "hard" && emptyCells.includes(4)) {
     return 4;
   }
 
+  // for (const cell of emptyCells) {
+  //   const testBoard = [...board];
+  //   if (testBoard[cell]?.includes(4))
+  // }
+
   // Strategy 4: Take corners (good strategic positions)
+  // dont touch this perfect for ai X winning
+  // dont touch this perfect for ai X winning
+
   const corners = [0, 2, 6, 8];
+  const edges = [1, 3, 5, 7];
+
+  const availableEdges = edges.filter((edge) => emptyCells.includes(edge));
+  if (
+    aiDifficulty !== "easy" &&
+    (!emptyCells.includes(0) ||
+      !emptyCells.includes(2) ||
+      !emptyCells.includes(6) ||
+      !emptyCells.includes(8)) &&
+    availableEdges.length > 0
+  ) {
+    return availableEdges[Math.floor(Math.random() * availableEdges.length)];
+  }
+
   const availableCorners = corners.filter((corner) =>
-    available.includes(corner)
+    emptyCells.includes(corner)
   );
-  if (availableCorners.length > 0) {
+  if (
+    aiDifficulty !== "easy" &&
+    !emptyCells.includes(4) &&
+    (!emptyCells.includes(1) ||
+      !emptyCells.includes(3) ||
+      !emptyCells.includes(5) ||
+      !emptyCells.includes(7)) &&
+    availableCorners.length > 0
+  ) {
     return availableCorners[
       Math.floor(Math.random() * availableCorners.length)
     ];
   }
 
-  // Strategy 5: Take any remaining cell
-  return available[Math.floor(Math.random() * available.length)];
+  // Strategy 6: Take any remaining cell
+  return emptyCells[Math.floor(Math.random() * emptyCells.length)];
 };
 
 const reducer = (state: GameState, action: GameAction): GameState => {
@@ -320,7 +354,11 @@ const reducer = (state: GameState, action: GameAction): GameState => {
         return state;
       }
 
-      const aiMove = getSmartAIMove(state.board, state.currentPlayer);
+      const aiMove = getSmartAIMove(
+        state.board,
+        state.currentPlayer,
+        state.settings.aiDifficulty
+      );
 
       const newBoard = [...state.board];
       newBoard[aiMove] = state.currentPlayer;

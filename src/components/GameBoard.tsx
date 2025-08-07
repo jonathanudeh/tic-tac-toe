@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useGame } from "../context/GameContext";
 import OPiece from "./OPiece";
 import PlayersCard from "./PlayersCard";
-import ScoreBoard from "./ScoreBoard";
+import ScoreBoard from "./ActionBoard";
 import XPiece from "./XPiece";
 
 function GameBoard() {
