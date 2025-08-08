@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useReducer,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useReducer, type ReactNode } from "react";
 
 const GameConext = createContext<GameContextType | undefined>(undefined);
 

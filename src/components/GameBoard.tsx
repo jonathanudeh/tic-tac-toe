@@ -155,7 +155,14 @@ function GameBoard() {
         </div>
       )}
 
-      {showGameFinished && <NavigationOverlay />}
+      {showGameFinished && (
+        <NavigationOverlay
+          showRestartMenu={false}
+          showMenu={false}
+          setShowRestartMenu={() => {}}
+          setShowMenu={() => {}}
+        />
+      )}
 
       <ScoreBoard />
     </div>
