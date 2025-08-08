@@ -1,69 +1,57 @@
-# React + TypeScript + Vite
+# 🎮 PlayToe – Next-Level Tic Tac Toe
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**PlayToe** is not your ordinary Tic Tac Toe. Built with **React**, **TypeScript**, **Tailwind CSS**, and **Vite**, it takes the classic game to the next level with **multiple AI difficulties**, **Player vs Player mode**, and **immersive sound effects** – all wrapped in a sleek, responsive design.
 
-Currently, two official plugins are available:
+🔗 **Play now:** [playtoe.vercel.app](https://playtoe.vercel.app)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## ✨ Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **🤖 Player vs AI** – Challenge an AI that adapts to your skill level:
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+  - **Easy** – For warm-ups and casual fun
+  - **Normal** – A balanced challenge for most players
+  - **Hard** – Test your wits against near-perfect strategy
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+- **👥 Player vs Player** – Go head-to-head with a friend on the same device or even practice your strategies.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **🔊 Sounds & Feedback** – Engaging sound effects for every move and win.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- **⚡ Fast & Responsive** – Built with **Vite** for blazing-fast performance.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **🎨 Modern UI** – Styled with **Tailwind CSS** for a clean, responsive design.
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+
+## 🛠️ Tech Stack
+
+- **React**
+- **TypeScript**
+- **Tailwind CSS**
+- **Vite**
+
+---
+
+## 📸 Preview
+
+![PlayToe Screenshot](link-to-your-screenshot.png)
+
+---
+
+## 🏆 Future Improvements
+
+- Online multiplayer mode
+- Customizable themes and player icons
+- Statistics
+
+---
+
+## 📬 Feedback
+
+Have ideas, suggestions, or found a bug? Open an issue or drop a message.
+
+---
+
+**Enjoy the game and may the best player win!** 🎯  
+🔗 **Play now:** [playtoe.vercel.app](https://playtoe.vercel.app)

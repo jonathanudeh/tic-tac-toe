@@ -51,9 +51,9 @@ function Settings() {
             }
             className="w-full p-2 border-2 bg-black/50 border-white/30 rounded text-center font-bold text-white"
           >
-            <option value="easy">Easy (Makes mistakes)</option>
-            <option value="medium">Medium (Sometimes smart)</option>
-            <option value="hard">Hard (Always optimal)</option>
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
           </select>
         </div>
 
