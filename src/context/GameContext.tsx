@@ -1,4 +1,11 @@
-import { createContext, useContext, useReducer, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useReducer,
+  type ReactNode,
+} from "react";
+import { useSound } from "../custom-hook/useSound";
 
 const GameConext = createContext<GameContextType | undefined>(undefined);
 
@@ -305,9 +312,6 @@ const reducer = (state: GameState, action: GameAction): GameState => {
 
       const { winner, winningCombination } = checkWinner(newBoard);
 
-      if (!winner && state.settings.soundEnabled)
-        new Audio("/button-click.wav").play();
-
       const isDraw =
         !winner &&
         (newBoard.every((cell) => cell !== null) || isDefiniteDraw(newBoard));
@@ -327,12 +331,9 @@ const reducer = (state: GameState, action: GameAction): GameState => {
         if (state.settings.soundEnabled) new Audio("/win.mp3").play();
       } else if (isDraw) {
         updatedDraws = state.draws + 1;
-
-        if (state.settings.soundEnabled) new Audio("/draw.mp3").play();
       }
 
       const gameStatus = winner || isDraw ? "finished" : "playing";
-      // if (gameStatus === "finished" && !winner) new Audio("/lost.wav").play();
       const nextPlayer = state.currentPlayer === "X" ? "O" : "X";
 
       return {
@@ -370,8 +371,8 @@ const reducer = (state: GameState, action: GameAction): GameState => {
 
       const { winner, winningCombination } = checkWinner(newBoard);
 
-      if (!winner && state.settings.soundEnabled)
-        new Audio("/button-click.wav").play();
+      // if (!winner && state.settings.soundEnabled)
+      //   new Audio("/button-click.wav").play();
 
       const isDraw =
         !winner &&
@@ -474,6 +475,41 @@ interface GameProviderProps {
 
 const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const { playSound } = useSound(state.settings.soundEnabled);
+
+  useEffect(() => {
+    if (state.gameStatus === "finished") {
+      if (state.winner) {
+        // Check if the winner is the human player
+        const isHumanWinner = state.players[state.winner]?.isHuman;
+        if (state.gameMode === "vsAi") {
+          playSound(isHumanWinner ? "win" : "lose");
+        } else {
+          playSound("win");
+        }
+      } else if (state.isDraw) {
+        playSound("draw");
+      }
+    }
+  }, [
+    state.gameStatus,
+    state.winner,
+    state.isDraw,
+    state.gameMode,
+    state.players,
+    playSound,
+  ]);
+
+  // Handle move sounds
+  useEffect(() => {
+    // Only play click sound for actual moves (not on initial load or game reset)
+    if (
+      state.board.some((cell) => cell !== null) &&
+      state.gameStatus === "playing"
+    ) {
+      playSound("click");
+    }
+  }, [state.board, state.gameStatus, playSound]);
 
   return (
     <GameConext.Provider
