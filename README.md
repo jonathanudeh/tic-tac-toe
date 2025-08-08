@@ -35,7 +35,7 @@
 
 ## 📸 Preview
 
-![PlayToe Screenshot](link-to-your-screenshot.png)
+![PlayToe Screenshot](/playtoe-preview.jpg)
 
 ---
 
