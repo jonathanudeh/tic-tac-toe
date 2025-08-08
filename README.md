@@ -1,4 +1,4 @@
-# 🎮 PlayToe – Next-Level Tic Tac Toe
+# PlayToe – Next-Level Tic Tac Toe 🎮
 
 **PlayToe** is not your ordinary Tic Tac Toe. Built with **React**, **TypeScript**, **Tailwind CSS**, and **Vite**, it takes the classic game to the next level with **multiple AI difficulties**, **Player vs Player mode**, and **immersive sound effects** – all wrapped in a sleek, responsive design.
 

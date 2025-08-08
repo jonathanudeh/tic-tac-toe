@@ -3,7 +3,7 @@ import { useGame } from "../context/GameContext";
 import NavigationOverlay from "./NavigationOverlay";
 
 function ActionBoard() {
-  const { state, dispatch } = useGame();
+  const { state } = useGame();
   const [showRestartMenu, setShowRestartMenu] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
 

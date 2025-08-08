@@ -1,11 +1,18 @@
 import { useGame } from "../context/GameContext";
 
+interface NavigationOverlayProps {
+  showRestartMenu?: boolean;
+  showMenu?: boolean;
+  setShowRestartMenu: (show: boolean) => void;
+  setShowMenu: (show: boolean) => void;
+}
+
 function NavigationOverlay({
   showRestartMenu = false,
   showMenu = false,
   setShowRestartMenu,
   setShowMenu,
-}) {
+}: NavigationOverlayProps) {
   const { state, dispatch } = useGame();
   return (
     <>
