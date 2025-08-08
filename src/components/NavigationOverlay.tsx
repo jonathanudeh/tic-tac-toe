@@ -18,7 +18,7 @@ function NavigationOverlay({
     <>
       <div className="bg-black/40 fixed inset-0 w-full h-full"></div>
       <div
-        className={`fixed top-1/2 -translate-y-1/2 bg-[#9d7bfc]  w-4/5 sm:w-2/3 h-60 rounded-lg flex flex-col items-center ${
+        className={`fixed top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 bg-[#9d7bfc]  w-4/5 sm:w-2/3 h-60 rounded-lg flex flex-col items-center ${
           state.gameStatus === "finished" && "justify-start"
         } ${(showRestartMenu || showMenu) && "justify-center"} gap-7 p-4`}
       >

@@ -1,12 +1,20 @@
+import { leftCardVariants, RightCardVariants } from "../animations";
 import { useGame } from "../context/GameContext";
+import { motion } from "framer-motion";
 
 function PlayersCard() {
   const { state } = useGame();
 
   return (
-    <div className="w-full sm:w-2/5 h-auto flex items-center justify-between m-0 p-0">
+    <motion.div
+      className="w-full sm:w-2/5 h-auto flex items-center justify-between m-0 p-0"
+      initial="initial"
+      animate="animate"
+      exit="exit"
+    >
       {/* player X */}
-      <div
+      <motion.div
+        variants={leftCardVariants}
         className={`${
           state.gameStatus !== "pickSide" ? "w-25 h-30" : "w-30 h-35"
         } py-2 bg-[#1A004D] rounded-2xl shadow-lg flex flex-col justify-around items-center transition-all duration-300 ${
@@ -38,7 +46,7 @@ function PlayersCard() {
             {state.gameStatus === "playing" ? state.players["X"].score : ""}
           </span>
         </div>
-      </div>
+      </motion.div>
 
       {/* draw */}
       {state.gameStatus === "playing" && (
@@ -49,11 +57,19 @@ function PlayersCard() {
       )}
 
       {state.gameStatus === "pickSide" && (
-        <div className="text-white text-4xl font-bold opacity-50">VS</div>
+        <motion.div
+          className="text-white text-4xl font-bold opacity-50"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          VS
+        </motion.div>
       )}
 
       {/* player O */}
-      <div
+      <motion.div
+        variants={RightCardVariants}
         className={`${
           state.gameStatus !== "pickSide" ? "w-25 h-30" : "w-30 h-35"
         } py-2 bg-[#1A004D] rounded-2xl shadow-lg flex flex-col justify-around items-center transition-all duration-300 ${
@@ -85,8 +101,8 @@ function PlayersCard() {
             {state.gameStatus === "playing" ? state.players["O"].score : ""}
           </span>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
