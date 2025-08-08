@@ -4,12 +4,11 @@ import OPiece from "./OPiece";
 import PlayersCard from "./PlayersCard";
 import ScoreBoard from "./ActionBoard";
 import XPiece from "./XPiece";
+import NavigationOverlay from "./NavigationOverlay";
 
 function GameBoard() {
   const { state, dispatch } = useGame();
-  const [showGameFinished, setShowGameFinished] = useState(
-    state.gameStatus === "finished"
-  );
+  const [showGameFinished, setShowGameFinished] = useState(false);
 
   const {
     board,
@@ -26,7 +25,7 @@ function GameBoard() {
 
       const finishedTimer = setTimeout(() => {
         setShowGameFinished(true);
-      }, 1500);
+      }, 1000);
 
       return () => clearTimeout(finishedTimer);
     } else {
@@ -156,43 +155,7 @@ function GameBoard() {
         </div>
       )}
 
-      {showGameFinished && (
-        <>
-          <div className="bg-black/40 fixed inset-0 w-full h-full"></div>
-          <div className="fixed top-1/2 -translate-y-1/2 bg-[#9d7bfc]  w-4/5 sm:w-2/3 h-60 rounded-lg flex flex-col items-center justify-start gap-7 p-4">
-            <div className="flex flex-col items-center justify-center gap-5 font-bold w-full h-2/3 text-center">
-              <span className="text-2xl opacity-75">
-                {state.winner === state.selectedPlayer && "Yayy,🥳 You Won!"}
-                {state.winner !== state.selectedPlayer &&
-                  !state.isDraw &&
-                  "sigh,😔 you lost..."}
-              </span>
-              <span
-                className={`font-bold text-5xl ${
-                  state.winner === "X" && "text-[#1100ff]"
-                } ${state.winner === "O" && "text-[#FFD700]"}`}
-              >
-                {state.winner ? `${state.winner} wins` : "Round Tied"}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between gap-7">
-              <button
-                className="bg-red-500/50 backdrop-blur-sm text-white w-20 h-12 rounded-lg font-bold border-b-4 border-b-red-800 hover:bg-red-500 transition-all cursor-pointer"
-                onClick={() => dispatch({ type: "BACK_TO_MENU" })}
-              >
-                Quit
-              </button>
-              <button
-                className="bg-green-500/80 backdrop-blur-sm text-white w-30 h-12 rounded-lg font-bold border-b-4 border-b-green-800 hover:bg-green-500 transition-all cursor-pointer"
-                onClick={() => dispatch({ type: "NEW_ROUND" })}
-              >
-                New Round
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+      {showGameFinished && <NavigationOverlay />}
 
       <ScoreBoard />
     </div>
