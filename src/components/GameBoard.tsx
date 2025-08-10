@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useGame } from "../context/GameContext";
 import PlayersCard from "./PlayersCard";
-import ScoreBoard from "./ActionBoard";
 import NavigationOverlay from "./NavigationOverlay";
 import { itemVariants, overlayVariants } from "../animations";
 import GridBoard from "./GrideBoard";
 import BoxBoard from "./BoxBoard";
+import ActionBoard from "./ActionBoard";
 
 function GameBoard() {
   const { state, dispatch } = useGame();
@@ -60,7 +60,7 @@ function GameBoard() {
     return null;
 
   return (
-    <motion.div className="relative w-full max-h-screen h-screen bg-gradient-to-b from-[#9d7bfc] via-[#6a60c4] to-[#9883f3] flex flex-col items-center justify-start gap-3 p-4">
+    <motion.div className="relative w-full max-h-screen h-screen bg-gradient-to-b from-[#9d7bfc] via-[#6a60c4] to-[#9883f3] flex flex-col items-center justify-start gap-4 p-4">
       <motion.div
         className="bg-[#1A004D]/70 m-0 text-center max-w-40 w-30 h-auto p-2 font-bold text-xl text-white rounded-lg shadow-lg backdrop-blur-lg"
         variants={itemVariants}
@@ -68,7 +68,10 @@ function GameBoard() {
         Round {round}
       </motion.div>
 
-      <motion.div className="w-full" variants={itemVariants}>
+      <motion.div
+        className="w-full flex justify-center items-center"
+        variants={itemVariants}
+      >
         <PlayersCard />
       </motion.div>
 
@@ -86,8 +89,11 @@ function GameBoard() {
         </motion.div>
       )}
 
-      <motion.div className="w-full" variants={itemVariants}>
-        <ScoreBoard />
+      <motion.div
+        className="w-full flex justify-center items-center"
+        variants={itemVariants}
+      >
+        <ActionBoard />
       </motion.div>
     </motion.div>
   );

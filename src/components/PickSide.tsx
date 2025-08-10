@@ -36,7 +36,7 @@ function PickSide() {
         Choose Your Side
       </motion.div>
 
-      <motion.div className="w-full">
+      <motion.div className="w-full flex justify-center items-center">
         <PlayersCard />
       </motion.div>
 
